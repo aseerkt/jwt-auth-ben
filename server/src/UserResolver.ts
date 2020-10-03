@@ -2,6 +2,7 @@ import {
   Arg,
   Ctx,
   Field,
+  Int,
   Mutation,
   ObjectType,
   Query,
@@ -14,6 +15,7 @@ import { MyContext } from './MyContext';
 import { createAccessToken, createRefreshToken } from './auth';
 import { isAuth } from './isAuth';
 import { sendRefreshToken } from './sendRefreshToken';
+import { getConnection } from 'typeorm';
 
 @ObjectType()
 class LoginResponse {
@@ -36,6 +38,19 @@ export class UserResolver {
   @UseMiddleware(isAuth)
   bye(@Ctx() { payload }: MyContext) {
     return `you user id is ${payload?.userId}`;
+  }
+
+  @Mutation(() => Boolean)
+  async revokeRefreshTokenForUSer(@Arg('userId', () => Int) userId: number) {
+    try {
+      await getConnection()
+        .getRepository(User)
+        .increment({ id: userId }, 'tokenVersion', 1);
+      return true;
+    } catch (err) {
+      console.log(err);
+      return false;
+    }
   }
 
   @Mutation(() => LoginResponse)

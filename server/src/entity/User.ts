@@ -15,6 +15,9 @@ export class User extends BaseEntity {
   // We don't want expose password so no field
   @Column('text')
   password: string;
+
+  @Column('int', { default: 0 })
+  tokenVersion: number;
 }
 
 // Base Entity helps use user.save feature

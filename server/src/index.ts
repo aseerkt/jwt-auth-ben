@@ -31,15 +31,19 @@ import { createAccessToken, createRefreshToken } from './auth';
       return res.status(401).json({ ok: false, accessToken: '', err });
     }
 
-    // token is valid and we can send back an access token
+    // token is valid and we can send back new access token
 
     const user = await User.findOne({ where: { id: payload.userId } });
     if (!user) {
       return res.status(401).json({ ok: false, accessToken: '' });
     }
-    // Remake refresh token
+    // Check if tokenVersion matches or not.
+    if (user.tokenVersion !== payload.tokenVersion) {
+      return res.status(401).json({ ok: false, accessToken: '' });
+    }
+    // Remake refresh token and add it cookie
     sendRefreshToken(res, createRefreshToken(user));
-    return res.json({ ok: true, accessTokem: createAccessToken(user) });
+    return res.json({ ok: true, accessToken: createAccessToken(user) });
   });
 
   // Connect to DB
