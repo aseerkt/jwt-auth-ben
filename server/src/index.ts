@@ -1,6 +1,8 @@
 import 'reflect-metadata';
 import express from 'express';
 import { ApolloServer } from 'apollo-server-express';
+import { buildSchema } from 'type-graphql';
+import { UserResolver } from './UserResolver';
 
 (async () => {
   const app = express();
@@ -10,16 +12,9 @@ import { ApolloServer } from 'apollo-server-express';
   });
 
   const apolloServer = new ApolloServer({
-    typeDefs: `
-        type Query {
-            hello: String!
-        }
-      `,
-    resolvers: {
-      Query: {
-        hello: () => 'Hello World',
-      },
-    },
+    schema: await buildSchema({
+      resolvers: [UserResolver],
+    }),
   });
 
   apolloServer.applyMiddleware({ app }); // This will enable graphql server at /graphql
