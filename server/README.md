@@ -10,3 +10,9 @@
 - `yarn add express apollo-server-express graphql`
 - `yarn add -D @types/express @types/graphql`
 - `yarn add type-graphql`
+
+## Get the cookie part working
+
+- Add context apolloServer
+- create context interface
+- on graphql server settings set `"request.credentials": "omit",` to `"request.credentials": "include",`
