@@ -9,3 +9,4 @@
 
 - `yarn add express apollo-server-express graphql`
 - `yarn add -D @types/express @types/graphql`
+- `yarn add type-graphql`
