@@ -6,11 +6,14 @@ import {
   ObjectType,
   Query,
   Resolver,
+  UseMiddleware,
 } from 'type-graphql';
 import { hash, genSalt, compare } from 'bcryptjs';
 import { User } from './entity/User';
 import { MyContext } from './MyContext';
 import { createAccessToken, createRefreshToken } from './auth';
+import { isAuth } from './isAuth';
+import { sendRefreshToken } from './sendRefreshToken';
 
 @ObjectType()
 class LoginResponse {
@@ -28,6 +31,11 @@ export class UserResolver {
   @Query(() => [User])
   async users() {
     return await User.find();
+  }
+  @Query(() => String)
+  @UseMiddleware(isAuth)
+  bye(@Ctx() { payload }: MyContext) {
+    return `you user id is ${payload?.userId}`;
   }
 
   @Mutation(() => LoginResponse)
@@ -50,7 +58,7 @@ export class UserResolver {
       // login successfull
 
       // Add refreshToken to cookie
-      res.cookie('jid', createRefreshToken(user), { httpOnly: true });
+      sendRefreshToken(res, createRefreshToken(user));
 
       return {
         accessToken: createAccessToken(user),
